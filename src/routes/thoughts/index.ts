@@ -39,7 +39,8 @@ export async function get({ url }) {
 		}
 	} else {
 		return {
-			status: 404
+			status: 404,
+			body: "Thought not found"
 		};
 	}
 }
@@ -107,6 +108,12 @@ export async function del({ request }) {
 		}
 	}
 
+	if(thoughts[body.id] == undefined) {
+		return {
+			status: 404,
+			body: "Thought not found"
+		}
+	}
 	try {
 		thoughts.splice(body.id,1)
 		await client.set("thoughts",thoughts)
