@@ -3,6 +3,8 @@
     export let message
     export let dateString
     export let id
+    export let edited
+    export let oldMessages
     import { goto } from "$app/navigation";
 
     function clickHandler() {
@@ -10,9 +12,16 @@
     		goto(`/thoughts/${id}`)
     	}
     }
+
+    let timesEditedString = oldMessages.length > 1 ? oldMessages.length + " times" : ""
   </script>
 
-  <div on:click={clickHandler}>
+  <div class="main" on:click={clickHandler}>
+  	  {#if edited}
+  		<div class="edited">
+  			<h2> This thought was edited {timesEditedString}</h2>
+  		</div>
+  	  {/if}
 	  <h2>
 		  {message}
 	  </h2>
@@ -24,7 +33,7 @@
 
   <style>
   	  @import url('http://fonts.cdnfonts.com/css/helvetica-neue-9');
-	  div {
+	  div.main {
 	  	background-color: black;
 	  	color: white;
 	  	padding-top: 0.5rem;
@@ -32,6 +41,17 @@
 	  	border-radius: 10px;
 	  	word-wrap: break-word;
 	  	width: 35rem;
+	  	margin-bottom: 0.5rem;
+	  }
+
+	  div.edited {
+	  	margin-top: 0.5rem;
+	  	background-color: red;
+	  	padding: 0.25rem;
+	  }
+
+	  div.edited > h2 {
+	  	margin-top: 0.5rem;
 	  	margin-bottom: 0.5rem;
 	  }
 

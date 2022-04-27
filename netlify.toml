@@ -4,6 +4,8 @@
   functions = "netlify/functions"
   publish = "build"
 
+[context.production]
+  command = "npx dotenv-vault@latest pull production .env --dotenvMe $PRODUCTION_DOTENV_IT && npm run build"
   ## Uncomment to use this redirect for Single Page Applications like create-react-app.
   ## Not needed for static site generators.
   #[[redirects]]

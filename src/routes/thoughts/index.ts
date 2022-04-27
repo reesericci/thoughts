@@ -1,36 +1,13 @@
 import 'temporal-polyfill/global';
-import client from "$lib/redis.ts";
+import client, { getThoughts } from "$lib/redis.ts";
 import jwt from "jsonwebtoken";
+import Thought from "$lib/Thought.ts"
 
-class Thought {
-	message: string;
-	#date: Temporal.ZonedDateTime;
-	dateString: string;
-	id: number
-	constructor(message: string, iso8601: string, id: number) {
-		this.message = message;
-		this.date = Temporal.ZonedDateTime.from(iso8601)
-		this.dateString = this.date.toLocaleString();
-		this.id = id
-	}
-}
-async function getThoughts() {
-	const initialThoughts = await client.get("thoughts")
+export async function get() {
 
-	if(initialThoughts == undefined || Object.entries(await client.get("thoughts")).length === 0) {
-		await client.set("thoughts",[])
 
-	}
-	const thoughts = await client.get("thoughts")
 
-	const parsed = thoughts.map((obj, i) => new Thought(obj.message,obj.date,i))
-	return parsed
-
-}
-
-export async function get({ url }) {
-
-	const thoughts: Thought[] = await getThoughts()
+	const thoughts: Thought[] = await getThoughts(client) ?? []
 
 	if (thoughts.length > 0) {
 		return {
@@ -46,11 +23,12 @@ export async function get({ url }) {
 }
 
 export async function post({ request }) {
+
 	try {
 		const headers = request.headers;
 		const token = headers.get("authorization").split("Bearer ")[1];
+		const payload = jwt.verify(token,`${import.meta.env.THOUGHTS_PUBKEY}` , { algorithms: ['RS256'] })
 
-		jwt.verify(token, process.env["PUBKEY"], { algorithms: ['RS256'] })
 	} catch(e) {
 		return {
 			status: 403,
@@ -58,23 +36,22 @@ export async function post({ request }) {
 		}
 	}
 
-	const thoughts = await getThoughts()
+	const thoughts = await getThoughts(client)
 
 	const body = await request.json();
 
 
 	try {
-		new Thought(body.message,body.iso8601)
+		new Thought({message: body.message,iso8601: body.iso8601})
 	} catch(e) {
 		console.error(e)
 		return {
 			status: 400
 		}
 	}
-	const thoughtIndex = thoughts.push(new Thought(body.message,body.iso8601,thoughts.length)) -1
+	const thoughtIndex = thoughts.push(new Thought({message: body.message,iso8601: body.iso8601,id: thoughts.length})) -1
 
-
-	await client.set("thoughts",thoughts);
+	await client.set("thoughts",JSON.stringify(thoughts));
 
 	return {
 		status: 200,
@@ -87,8 +64,7 @@ export async function del({ request }) {
 	try {
 		const headers = request.headers;
 		const token = headers.get("authorization").split("Bearer ")[1];
-
-		jwt.verify(token, process.env["PUBKEY"], { algorithms: ['RS256'] })
+		jwt.verify(token, `${import.meta.env.THOUGHTS_PUBKEY}`, { algorithms: ['RS256'] })
 	} catch(e) {
 		return {
 			status: 403,
@@ -99,10 +75,9 @@ export async function del({ request }) {
 
 	const body = await request.json()
 
-	const thoughts = await getThoughts()
+	const thoughts = await getThoughts(client)
 
 	if(body == undefined || body.id == undefined) {
-
 		return {
 			status: 400
 		}
@@ -116,13 +91,63 @@ export async function del({ request }) {
 	}
 	try {
 		thoughts.splice(body.id,1)
-		await client.set("thoughts",thoughts)
+		await client.set("thoughts",JSON.stringify(thoughts))
 
 	} catch(e) {  console.error(e); return {status: 500, body: e}}
 
 	return {
 		status: 200,
 		body: thoughts
+	}
+
+}
+
+export async function patch({ request }) {
+
+	try {
+		const headers = request.headers;
+		const token = headers.get("authorization").split("Bearer ")[1];
+		jwt.verify(token, import.meta.env.THOUGHTS_PUBKEY, { algorithms: ['RS256'] })
+	} catch(e) {
+		return {
+			status: 403,
+			body: e
+		}
+	}
+
+
+
+	const body = await request.json()
+	const thoughts = await getThoughts(client)
+
+	if(body.message == undefined || body.id == undefined || body.iso8601 == undefined) {
+		return {
+			status: 400,
+			body: "You may be missing params message, id, or iso8601"
+		}
+	}
+
+	if(thoughts[body.id] == undefined) {
+		return {
+			status: 404,
+			body: "Thought not found"
+		}
+	}
+
+	try {
+		thoughts[body.id].edit(body.message,body.iso8601);
+
+		await client.set("thoughts",JSON.stringify(thoughts))
+	} catch(e) {
+		return {
+			status: 500,
+			body: e
+		}
+	}
+
+	return {
+		status: 200,
+		body: thoughts[body.id]
 	}
 
 }

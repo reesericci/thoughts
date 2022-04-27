@@ -12,7 +12,8 @@ const config = {
 		vite: {
 		  build: {
 		    target: ["es2020"]
-		  }
+		  },
+      envPrefix: "THOUGHTS_"
 		}
 	}
 };
