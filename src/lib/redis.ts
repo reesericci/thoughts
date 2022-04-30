@@ -16,8 +16,6 @@ export async function getThoughts(client) {
 
 	const thoughts = await client.get("thoughts")
 
-	console.log(thoughts)
-
 	const parsed = thoughts.map((obj) => new Thought({
 		message: obj.message,
 		iso8601: obj.date,

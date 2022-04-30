@@ -1,11 +1,12 @@
 
   <script>
     export let message
-    export let dateString
+    export let date
     export let id
     export let edited
     export let oldMessages
     import { goto } from "$app/navigation";
+    import 'temporal-polyfill/global';
 
     function clickHandler() {
     	if(id || id == 0) {
@@ -26,7 +27,7 @@
 		  {message}
 	  </h2>
 	  <p>
-		  {dateString}
+		  {Temporal.ZonedDateTime.from(date).toLocaleString()}
 	  </p>
   </div>
 
