@@ -5,8 +5,6 @@ import Thought from "$lib/Thought.ts"
 
 export async function get() {
 
-
-
 	const thoughts: Thought[] = await getThoughts(client) ?? []
 
 	if (thoughts.length > 0) {
