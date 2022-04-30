@@ -15,7 +15,7 @@
 
 <style>
 
-@import url('http://fonts.cdnfonts.com/css/helvetica-neue-9');
+@import url('https://fonts.cdnfonts.com/css/helvetica-neue-9');
 
 :global(:root), *, h1 {
 	font-family: "Helvetica Neue", system-ui;
