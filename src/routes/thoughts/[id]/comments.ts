@@ -87,9 +87,9 @@ export async function del({ request, params }) {
 
 	const thoughts = await getThoughts(client)
 
-	const comments = thoughts[params.id].comments
+	const comments = thoughts[params.id].comments.sort((a,b) => Temporal.ZonedDateTime.compare(a.iso8601,b.iso8601)).reverse();
 
-	if(!body.id) return {
+	if(!body.id && body.id != 0) return {
 		status: 400,
 		body: "comment id not provided"
 	}
@@ -109,6 +109,6 @@ export async function get({ params }) {
 
 	return {
 		status:200,
-		body: thoughts[params.id].comments
+		body: thoughts[params.id].comments.sort((a,b) => Temporal.ZonedDateTime.compare(a.iso8601,b.iso8601)).reverse()
 	}
 }

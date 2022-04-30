@@ -11,7 +11,7 @@
           id: params.id,
           comments: res[params.id].comments.map((val, i) => {
             return {id: i, ...val}
-          })
+          }).sort((a,b) => Temporal.ZonedDateTime.compare(a.iso8601,b.iso8601)).reverse()
         }
       }
     }
