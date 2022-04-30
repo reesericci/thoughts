@@ -89,8 +89,11 @@ export async function del({ request, params }) {
 
 	const comments = thoughts[params.id].comments
 
-
-	comments.splice(body.commentId,1)
+	if(!body.id) return {
+		status: 400,
+		body: "comment id not provided"
+	}
+	comments.splice(body.id,1)
 
 	await client.set("thoughts",thoughts)
 
