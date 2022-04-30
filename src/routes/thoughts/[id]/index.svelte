@@ -180,10 +180,6 @@
 
 
 <style>
-  @import url('http://fonts.cdnfonts.com/css/helvetica-neue-9');
-  * {
-    font-family: "Helvetica Neue", sans-serif;
-  }
   div {
     margin-bottom: 1rem;
     margin-top: 1rem;
