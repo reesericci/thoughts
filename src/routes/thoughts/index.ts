@@ -25,7 +25,7 @@ export async function post({ request }) {
 	try {
 		const headers = request.headers;
 		const token = headers.get("authorization").split("Bearer ")[1];
-		const payload = jwt.verify(token,`${import.meta.env.THOUGHTS_PUBKEY}` , { algorithms: ['RS256'] })
+		const payload = jwt.verify(token,`${import.meta.env.THOUGHTS_PUBKEY ?? process.env.THOUGHTS_PUBKEY}` , { algorithms: ['RS256'] })
 
 	} catch(e) {
 		return {
