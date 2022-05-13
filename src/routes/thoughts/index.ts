@@ -2,7 +2,6 @@ import 'temporal-polyfill/global';
 import client, { getThoughts } from "$lib/redis.ts";
 import jwt from "jsonwebtoken";
 import Thought from "$lib/Thought.ts"
-import 'dotenv/config'
 
 export async function get() {
 
