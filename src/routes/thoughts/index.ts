@@ -25,7 +25,7 @@ export async function post({ request }) {
 	try {
 		const headers = request.headers;
 		const token = headers.get("authorization").split("Bearer ")[1];
-		const payload = jwt.verify(token,`${import.meta.env.THOUGHTS_PUBKEY ?? process.env.THOUGHTS_PUBKEY}` , { algorithms: ['RS256'] })
+		const payload = jwt.verify(token,import.meta.env.THOUGHTS_PUBKEY ?? process.env.THOUGHTS_PUBKEY , { algorithms: ['RS256'] })
 
 	} catch(e) {
 		return {
@@ -62,7 +62,7 @@ export async function del({ request }) {
 	try {
 		const headers = request.headers;
 		const token = headers.get("authorization").split("Bearer ")[1];
-		jwt.verify(token, `${import.meta.env.THOUGHTS_PUBKEY}`, { algorithms: ['RS256'] })
+		jwt.verify(token, import.meta.env.THOUGHTS_PUBKEY ?? process.env.THOUGHTS_PUBKEY, { algorithms: ['RS256'] })
 	} catch(e) {
 		return {
 			status: 403,
@@ -105,7 +105,7 @@ export async function patch({ request }) {
 	try {
 		const headers = request.headers;
 		const token = headers.get("authorization").split("Bearer ")[1];
-		jwt.verify(token, import.meta.env.THOUGHTS_PUBKEY, { algorithms: ['RS256'] })
+		jwt.verify(token, import.meta.env.THOUGHTS_PUBKEY ?? process.env.THOUGHTS_PUBKEY, { algorithms: ['RS256'] })
 	} catch(e) {
 		return {
 			status: 403,
