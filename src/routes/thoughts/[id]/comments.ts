@@ -75,7 +75,7 @@ export async function del({ request, params }) {
 	try {
 		const headers = request.headers;
 		const token = headers.get("authorization").split("Bearer ")[1];
-		jwt.verify(token, import.meta.env.THOUGHTS_PUBKEY, { algorithms: ['RS256'] })
+		jwt.verify(token, import.meta.env.THOUGHTS_PUBKEY ?? process.env.THOUGHTS_PUBKEY, { algorithms: ['RS256'] })
 	} catch(e) {
 		return {
 			status: 403,
